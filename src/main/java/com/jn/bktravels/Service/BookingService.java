@@ -21,6 +21,7 @@ public class BookingService {
     }
 
     public ResponseEntity<?> book(@Valid BookingDto bookingDto) {
+
         try {
             return new ResponseEntity<>("Booking Successful! Please Proceed For Payment", HttpStatus.CREATED);
         } catch (Exception e) {

@@ -1,6 +1,6 @@
 package com.jn.bktravels.Service;
 
-
+import com.jn.bktravels.Config.FileUploadProperties;
 import com.jn.bktravels.Model.Destination;
 import com.jn.bktravels.Repository.DestinationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class DestinationService {
@@ -16,54 +18,49 @@ public class DestinationService {
     @Autowired
     private DestinationRepo destinationRepo;
 
+    @Autowired
+    private FileUploadProperties fileUploadProperties;
 
     // Get All Destinations
-    public ArrayList<Destination> getAllDestinations()  {
-
+    public ArrayList<Destination> getAllDestinations() {
         return (ArrayList<Destination>) destinationRepo.findAll();
     }
 
-
     // Add Destination
-    public ResponseEntity<?> addDestination(Destination destination, MultipartFile imageFile) {
-        destination.setImageName(imageFile.getOriginalFilename());
-        destination.setImageType(imageFile.getContentType());
-        try {
-            destination.setImageData(imageFile.getBytes());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error in Image Upload");
-        }
-        destinationRepo.save(destination);
-        return ResponseEntity.ok("Destination Added Successfully");
+    public ResponseEntity<String> addDestination(Destination destination) {
+
+            destinationRepo.save(destination); // Save only once
+
+            return ResponseEntity.ok("Destination Added Successfully");
     }
 
     // Get Destination By Id
     public Destination getDestinationById(int id) {
         return destinationRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Destination Not Found")
+                () -> new RuntimeException("Destination Not Found with ID: " + id)
         );
     }
-
 
     // Update Destination
-    public void updateDestination(int id, Destination destination, MultipartFile imageFile) {
-        Destination destinationToUpdate = destinationRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Destination Not Found")
-        );
-        destinationToUpdate.setImageName(imageFile.getOriginalFilename());
-        destinationToUpdate.setImageType(imageFile.getContentType());
-        try {
-            destinationToUpdate.setImageData(imageFile.getBytes());
-        } catch (Exception e) {
-            throw new RuntimeException("Error in Image Upload");
-        }
+    public ResponseEntity<String> updateDestination(int id, Destination destination) {
 
-        destinationRepo.save(destinationToUpdate);
+
+         var destinationExists  = destinationRepo.existsById(id);
+         if (destinationExists) {
+             destinationRepo.save(destination);
+             return ResponseEntity.ok("Destination Updated Successfully");
+         }
+
+            return ResponseEntity.badRequest().body("Error in Destination Update");
 
     }
-// Delete Destination
-    public void deleteDestination(int id) {
+
+    // Delete Destination
+    public ResponseEntity<String> deleteDestination(int id) {
+        if (!destinationRepo.existsById(id)) {
+            return ResponseEntity.badRequest().body("Destination Not Found with ID: " + id);
+        }
         destinationRepo.deleteById(id);
+        return ResponseEntity.ok("Destination Deleted Successfully");
     }
 }
-

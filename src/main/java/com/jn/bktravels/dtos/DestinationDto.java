@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+
 @Data
 public class DestinationDto {
     private Integer id;
@@ -19,14 +22,19 @@ public class DestinationDto {
     private String destinationDescription;
     @NotNull(message = "Destination Price cannot be null")
     private Double destinationPrice;
-    @NotNull(message = "Image File cannot be null")
-    private MultipartFile imageFile;
+    @NotNull(message = "Image Url cannot be null")
+    private String imageUrl;
+
+    @NotNull(message = "Destination Can Not be Null")
+    private LocalDateTime availability;
 
     public Destination toEntity() {
         return Destination.builder()
                 .destinationName(destinationName)
                 .destinationDescription(destinationDescription)
                 .destinationPrice(destinationPrice)
+                .imageUrl(imageUrl)
+                .availability(Collections.singletonList(availability))
                 .build();
     }
 }

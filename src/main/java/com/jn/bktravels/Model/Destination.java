@@ -4,6 +4,7 @@ package com.jn.bktravels.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -26,18 +27,14 @@ public class Destination {
     private String destinationDescription;
     @Column(nullable = false)
     private Double destinationPrice;
+
     @Column(nullable = false)
-    private String imageName;
-    @Column(nullable = false)
-    private String imageType;
+    private String imageUrl;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
-    private byte[] imageData;
-
-
-
-
+    @ElementCollection
+    @CollectionTable(name = "destination_availability", joinColumns = @JoinColumn(name = "destination_id"))
+    @Column(name = "available_date")
+    private List<LocalDateTime> availability;
 
 
 }

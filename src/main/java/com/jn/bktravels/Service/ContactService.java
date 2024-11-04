@@ -6,6 +6,8 @@ import com.jn.bktravels.Repository.ContactRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ContactService {
     @Autowired
@@ -19,4 +21,8 @@ public class ContactService {
             return "Error in saving contact";
         }
         }
+
+    public List<Contact> getAllContact() {
+        return contactRepo.findAll();
+    }
 }

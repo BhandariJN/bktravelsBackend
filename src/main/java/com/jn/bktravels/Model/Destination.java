@@ -28,7 +28,7 @@ public class Destination {
     @Column(nullable = false)
     private Double destinationPrice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String imageUrl;
 
     @ElementCollection

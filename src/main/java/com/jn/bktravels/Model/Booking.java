@@ -31,10 +31,10 @@ public class Booking {
     private double totalAmount;
 
     @Column(nullable = false)
-    private LocalDateTime bookedDate;
+    private LocalDate bookedDate;
 
     @Column(nullable = false)
-    private LocalDateTime selectedDate;
+    private LocalDate selectedDate;
 
 
     @Enumerated(EnumType.STRING)
@@ -52,7 +52,12 @@ public class Booking {
     )
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "destination_id",
+    nullable = false)
+    private  Destination destination;
 
-
+    @Column(nullable = true, insertable = false)
+    String uuid;
 
 }

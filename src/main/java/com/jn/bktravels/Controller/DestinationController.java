@@ -31,6 +31,7 @@ public class DestinationController {
 
     @PostMapping("/destination")
     public ResponseEntity<?> addDestination(@Validated @ModelAttribute DestinationDto destination) {
+        System.out.println(destination);
        try {
               ResponseEntity<?> receiveDestination = destinationService.addDestination(destination.toEntity());
               return new ResponseEntity<>(receiveDestination, HttpStatus.CREATED);
@@ -48,14 +49,8 @@ public class DestinationController {
     }
 
     @PutMapping("/destination/{id}")
-    public ResponseEntity<?> updateDestination(@PathVariable int id, @RequestPart("destination") Destination destination,
-                                              @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
-        try {
-            destinationService.updateDestination(id, destination);
-            return new ResponseEntity<>("Destination Updated Successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<?> updateDestination(@PathVariable int id, DestinationDto destinationDto) {
+       return new ResponseEntity<>(destinationService.updateDestination(id, destinationDto.toEntity()), HttpStatus.OK);
     }
 
     @DeleteMapping("/destination/{id}")

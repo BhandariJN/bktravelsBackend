@@ -4,6 +4,7 @@ import com.jn.bktravels.Config.FileUploadProperties;
 import com.jn.bktravels.Model.Destination;
 import com.jn.bktravels.Repository.DestinationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,16 +44,15 @@ public class DestinationService {
 
     // Update Destination
     public ResponseEntity<String> updateDestination(int id, Destination destination) {
+        boolean destinationExists = destinationRepo.existsById(id);
 
-
-         var destinationExists  = destinationRepo.existsById(id);
-         if (destinationExists) {
-             destinationRepo.save(destination);
-             return ResponseEntity.ok("Destination Updated Successfully");
-         }
-
-            return ResponseEntity.badRequest().body("Error in Destination Update");
-
+        if (destinationExists) {
+            destination.setId(id); // Ensure the ID is set on the destination entity
+            destinationRepo.save(destination);
+            return ResponseEntity.ok("Destination Updated Successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Destination not found with ID: " + id);
+        }
     }
 
     // Delete Destination

@@ -7,52 +7,41 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingDto {
 
+    @NotNull(message = "UserName is required")
+    private String userName;
 
-    @NotBlank(message = "User Id is required")
-        private Long userId;
-    @NotBlank(message = "Destination Id is required")
+    @NotNull(message = "Destination ID is required")
     private Long destinationId;
-    @NotBlank(message = "Number of Travellers is required")
-    private Integer numberofTravellers;
 
-    @NotNull(message = "Email is Required")
-    private String email;
-
-    @NotNull(message = "Phone No. is Required")
-    private String phoneNumber;
-
-
-    @NotBlank(message = "Total Amount is required")
-    private double totalAmount;
-
-    @NotBlank(message = "Date   is required")
-
-    private LocalDateTime selectedDateTime;
+    //@NotNull(message = "Number of Travellers is required")
+    private Integer numberOfTravellers;
 
 
 
 
-    public Booking toEntity(){
+  //  @NotNull(message = "Total Amount is required")
+    private Double totalAmount;
 
-        Booking build = Booking.builder()
-                .numberofTravellers(this.numberofTravellers)
+    @NotNull(message = "Selected Date is required")
+    private LocalDate selectedDateTime;
+
+    private Booking.Status status = Booking.Status.PENDING;
+
+    public Booking toEntity() {
+        return Booking.builder()
+                .numberofTravellers(this.numberOfTravellers)
                 .totalAmount(this.totalAmount)
-                .id(this.userId)
-                .id(this.destinationId)
                 .selectedDate(this.selectedDateTime)
-                .bookedDate(new Date())
+                .bookedDate(LocalDate.now())
+                .status(this.status)
                 .build();
-        return build;
-
     }
-
-
 }

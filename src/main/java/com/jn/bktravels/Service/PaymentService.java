@@ -8,11 +8,10 @@ import com.jn.bktravels.Config.Signature;
 import com.jn.bktravels.Model.Booking;
 import com.jn.bktravels.Model.EsewaPayment;
 import com.jn.bktravels.Repository.BookingRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -66,7 +65,7 @@ public class PaymentService {
                     .amount(String.valueOf(booking.getTotalAmount()))
                     .transaction_uuid(transactionUuid)
                     .build();
-            logger.info("Created EsewaPayment: {}", esewaPayment);
+            System.out.println(esewaPayment.toString());
             return esewaPayment;
         } else {
             logger.error("Booking not found for ID: {}", id);
@@ -74,37 +73,51 @@ public class PaymentService {
         }
     }
 
-    public RedirectView updatePayment(String encodedData, String id) throws IOException {
-            // Step 1: Decode the base64 encoded data
-            byte[] decodedBytes = Base64.getDecoder().decode(encodedData);
-            String decodedJson = new String(decodedBytes);
+    @Transactional
+    public RedirectView updatePayment(String encodedData, Long bookingId) throws IOException {
+        System.out.println("Encoded Data: " + encodedData);
 
-            // Step 2: Parse JSON data
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(decodedJson);
+        // Step 1: Decode the base64 encoded data
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedData);
+        String decodedJson = new String(decodedBytes);
+        System.out.println("Decoded JSON: " + decodedJson);
 
-            // Step 3: Extract required fields
-            String transactionCode = jsonNode.get("transaction_code").asText();
-            String status = jsonNode.get("status").asText();
-            String totalAmount = jsonNode.get("total_amount").asText();
-            String transactionUuid = jsonNode.get("transaction_uuid").asText();
-            String productCode = jsonNode.get("product_code").asText();
+        // Step 2: Parse JSON data
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(decodedJson);
 
+        // Step 3: Extract and validate required fields
+        String transactionCode = jsonNode.has("transaction_code") ? jsonNode.get("transaction_code").asText() : null;
+        String status = jsonNode.has("status") ? jsonNode.get("status").asText() : null;
+        String totalAmount = jsonNode.has("total_amount") ? jsonNode.get("total_amount").asText() : null;
+        String transactionUuid = jsonNode.has("transaction_uuid") ? jsonNode.get("transaction_uuid").asText() : null;
+        String productCode = jsonNode.has("product_code") ? jsonNode.get("product_code").asText() : null;
+
+        // Define redirect URL
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl("http://localhost:5500/viewownbooking.html");
-            if ("COMPLETED".equals(status)) {
-
-                Optional<Booking> booking = bookingRepo.findById((long) Long.parseLong(id));
-                if (booking.isPresent()) {
 
 
+        if ("COMPLETE".equals(status)) {
+            Optional<Booking> bookingOptional = bookingRepo.findById(bookingId);
+            if (bookingOptional.isPresent()) {
+                Booking booking = bookingOptional.get();
+                bookingRepo.updateBookingStatus(booking.getId(), Booking.Status.CONFIRMED, transactionUuid);
+                System.out.println("Payment completed for booking ID: " + bookingId);
 
-                    bookingRepo.updateBookingStatus(Long.valueOf(id), Booking.Status.PAID.name());
-
-                     // Redirect to a confirmation page
-                    return redirectView;
-                }
+                // Set success URL
+                redirectView.setUrl("http://localhost/bktravelfrontend/user-view/viewownbooking.html");
+                return redirectView;
+            } else {
+                System.out.println("Booking not found for ID: " + bookingId);
+                redirectView.setUrl("http://localhost/bktravelfrontend/user-view/viewownbooking.html");
             }
-            return  redirectView;
+        } else {
+            System.out.println("Payment status not complete for booking ID: " + bookingId);
+            redirectView.setUrl("http://localhost/bktravelfrontend/user-view/viewownbooking.html");
+        }
+
+         redirectView.setUrl("http://localhost/bktravelfrontend/user-view/viewownbooking.html");
+        return redirectView;
     }
+
 }

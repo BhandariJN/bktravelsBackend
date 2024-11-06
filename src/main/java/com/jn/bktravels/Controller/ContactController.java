@@ -22,13 +22,8 @@ public class ContactController {
 
     @PostMapping("/contact")
     public ResponseEntity<?> Contact(@RequestBody @Valid ContactDto contactDto) {
-        System.out.println("Contact: " + contactDto);
-        try {
 
-            return new ResponseEntity<>(contactService.saveContact(contactDto.toEntity()), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+       return contactService.saveContact(contactDto);
 
 
     }

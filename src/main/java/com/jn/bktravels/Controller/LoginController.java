@@ -3,6 +3,7 @@ package com.jn.bktravels.Controller;
 
 import com.jn.bktravels.Service.AdminLoginService;
 import com.jn.bktravels.Service.UserLoginService;
+import com.jn.bktravels.dtos.AdminDto;
 import com.jn.bktravels.dtos.UserDto;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -31,32 +32,13 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login( @RequestBody @Valid UserDto user, HttpSession session) {
-        System.out.println("User: " + user);
+    public ResponseEntity<?> login(@RequestBody @Valid UserDto user, HttpSession session) {
+        return userLoginService.userLogin(user.toEntity(), session);
+    }
 
-
-
-
-
-        // Check if the user is an admin or superadmin
-        ResponseEntity<?> response;
-        if (user.getUsername().equals("admin") || user.getUsername().equals("superadmin")) {
-
-            response = adminLoginService.adminLogin(user.toEntity());
-        } else {
-            response = userLoginService
-
-                    .userLogin(user.toEntity(), session );
-        }
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("message", "Login Successful");
-            responseBody.put("username", user.getUsername());
-            responseBody.put("session", session.getId());
-            return ResponseEntity.ok(responseBody);
-        }
-
-        return response;
+    @PostMapping("/admin-login")
+    public ResponseEntity<?> adminLogin(@RequestBody AdminDto admin, HttpSession session) {
+        return adminLoginService.adminLogin(admin, session);
     }
 }
+

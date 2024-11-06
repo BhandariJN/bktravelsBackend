@@ -3,24 +3,24 @@ package com.jn.bktravels.Controller;
 import com.jn.bktravels.Model.Destination;
 import com.jn.bktravels.Service.DestinationService;
 import com.jn.bktravels.dtos.DestinationDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 
 @CrossOrigin
 @RestController()
 public class DestinationController {
 
-    @Autowired
-    private  DestinationService destinationService;
 
+    private final DestinationService destinationService;
+
+    public DestinationController(DestinationService destinationService) {
+        this.destinationService = destinationService;
+    }
 
 
     @GetMapping("/destination")
@@ -57,5 +57,10 @@ public class DestinationController {
     public ResponseEntity<?> deleteDestination(@PathVariable int id) {
         destinationService.deleteDestination(id);
         return new ResponseEntity<>("Destination Deleted Successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/destination/search")
+    public ResponseEntity<?> searchDestination(@RequestParam String query) {
+        return new ResponseEntity<>(destinationService.getAllDestinationBySearch(query),HttpStatus.OK);
     }
 }

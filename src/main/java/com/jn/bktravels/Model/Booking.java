@@ -37,12 +37,13 @@ public class Booking {
     private LocalDate selectedDate;
 
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
 
     public enum Status {
         PENDING,
-        PAID,
+        CONFIRMED,
         CANCELLED
     }
 

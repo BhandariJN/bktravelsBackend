@@ -29,7 +29,7 @@ public class PaymentController {
 
     @GetMapping("/booking/payment-success/{id}")
     public RedirectView handlePaymentSuccess(@RequestParam("data") String encodedData, @PathVariable String id) throws IOException {
-       return paymentService.updatePayment(encodedData, id);
+       return paymentService.updatePayment(encodedData, Long.valueOf(id));
 
     }
     @GetMapping("/booking/payment-failure")

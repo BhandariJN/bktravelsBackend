@@ -39,7 +39,7 @@ public class UserLoginService {
             {
                 var id= userExists.getId();
                 HashMap<String, Object> map = new HashMap<>();
-                map.put("id", user.getId());
+                map.put("id", id);
                 map.put("username", user.getUsername());
                 map.put("session", httpSession.getId());
 

@@ -1,6 +1,7 @@
 package com.jn.bktravels.Service;
 
 
+import com.jn.bktravels.Mapper.ToOwnBookingResponseDto;
 import com.jn.bktravels.Model.Booking;
 import com.jn.bktravels.Model.Destination;
 import com.jn.bktravels.Model.User;
@@ -8,8 +9,10 @@ import com.jn.bktravels.Repository.BookingRepo;
 import com.jn.bktravels.Repository.DestinationRepo;
 import com.jn.bktravels.Repository.UserRepo;
 import com.jn.bktravels.dtos.BookingDto;
-import com.jn.bktravels.dtos.ToBookingDto;
+import com.jn.bktravels.Mapper.ToBookingDto;
+import com.jn.bktravels.dtos.OwnBookingResponseDto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,12 +26,17 @@ public class BookingService {
     private final BookingRepo bookingRepo;
     private final UserRepo userRepo;
     private final DestinationRepo destinationRepo;
+    private final ToBookingDto toBookingDto;
+    private final ToOwnBookingResponseDto toOwnBookingResponseDto;
 
 
-    public BookingService(BookingRepo bookingRepo, UserRepo userRepo, DestinationRepo destinationRepo) {
+    public BookingService(BookingRepo bookingRepo, UserRepo userRepo, DestinationRepo destinationRepo, ToBookingDto toBookingDto, ToOwnBookingResponseDto toOwnBookingResponseDto) {
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
         this.destinationRepo = destinationRepo;
+
+        this.toBookingDto = toBookingDto;
+        this.toOwnBookingResponseDto = toOwnBookingResponseDto;
     }
 
     public ResponseEntity<?> createBooking(BookingDto bookingDto) {
@@ -47,23 +55,26 @@ public class BookingService {
         return new ResponseEntity<>(bookingRepo.save(booking), HttpStatus.CREATED);
     }
 
-    public List<ToBookingDto> getAllBooking() {
+    public List<BookingDto> getAllBooking() {
         List<Booking> allBookings = bookingRepo.findAll();
 
-        // Convert list of Booking entities to list of ToBookingDto objects
-        return allBookings.stream()
-                .map(ToBookingDto::fromBooking)
-                .collect(Collectors.toList());
+       return allBookings.stream().map(toBookingDto::toBookingDto).toList();
+
     }
 
-    public List<ToBookingDto> getAllBookingByUserId(String username) {
+    public List<OwnBookingResponseDto> getAllBookingByUserId(String username) {
 
         List<Booking> allBookingOfUser = bookingRepo.findBookingByUserUsername(username);
 
         return allBookingOfUser.stream()
-                .map(ToBookingDto::fromBooking)
+                .map(toOwnBookingResponseDto::responseDto) // Correctly calling the static method
                 .collect(Collectors.toList());
+    }
 
 
+
+    @Transactional
+    public void cancelBooking(Long id) {
+        bookingRepo.deleteById(id);
     }
 }

@@ -2,6 +2,8 @@ package com.jn.bktravels.Model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.jn.bktravels.dtos.UserDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +34,12 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonBackReference
     private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "user")
+    @JsonBackReference
+    private List<Contact> contacts;
+
+
 
 
 }

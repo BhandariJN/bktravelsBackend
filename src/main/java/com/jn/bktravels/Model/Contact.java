@@ -33,6 +33,6 @@ public class Contact {
     private String message;
 
     @ManyToOne
-    @JoinColumn(insertable = false, name = "user_id", nullable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }

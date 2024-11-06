@@ -1,18 +1,18 @@
 package com.jn.bktravels.dtos;
 
 import com.jn.bktravels.Model.Booking;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BookingDto {
 
     @NotNull(message = "UserName is required")
